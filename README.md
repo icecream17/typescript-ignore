@@ -64,4 +64,41 @@ function CallableClass (func: Function, cls: AnyClass) {
 const test = (CallableClass(() => 7, class _ {}))()
 ```
 
+## Return type as the return type of another function
 
+```typescript
+// Because typeof class === "function"
+interface AnyClass extends Function {
+   new (...args: any[]): any
+}
+
+interface AnyCallableClass extends AnyClass {
+   (...args: any[]): any
+}
+
+// But where the return type === ```func``` return type
+function CallableClass (func: Function, cls: AnyClass): AnyCallableClass {
+   return new Proxy(cls, {
+      apply (_target: typeof cls, thisArg: any, argArray: any[]) {
+         func.apply(thisArg, argArray)
+      }
+   }) as AnyCallableClass & Args<func> => Return<func>
+}
+
+const test = (CallableClass(() => 7, class _ {}))()
+```
+
+### Fix
+
+This is possible, actually.
+
+```typescript
+// The return type is now (typeof func & typeof cls) because it gives more information
+function CallableClass <FuncReturn> (func: (...FuncArgs: any[]) => FuncReturn, cls: AnyClass): typeof func & typeof cls {
+   return new Proxy(cls, {
+      apply (_target: typeof cls, thisArg: any, argArray: any[]) {
+         return func.apply(thisArg, argArray)
+      }
+   }) as typeof func & typeof cls
+}
+```

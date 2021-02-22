@@ -102,3 +102,7 @@ function CallableClass <FuncReturn> (func: (...FuncArgs: any[]) => FuncReturn, c
    }) as typeof func & typeof cls
 }
 ```
+
+### Edit
+
+Oh, it actually exists: https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype
